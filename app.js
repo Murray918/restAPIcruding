@@ -28,7 +28,14 @@ app.post('/api/vendor/items/', (req, res,) => {
   });
 
 
-
+app.post('/api/customer/items/:itemId/purchases', (req, res,) => {
+  Vending.updateOne({
+      _id: new ObjectId(id)
+    }, {$inc:{quantity : -1}})
+    .then((results) => {
+      res.json( {status : 'success'})
+    })
+})
 
 
 
