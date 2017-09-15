@@ -1,44 +1,52 @@
 const mongoose = require('mongoose');
-const express = require('express');
-const bluebird = require('bluebird');
+mongoose.Promise = require('bluebird');
+let url = 'mongodb://localhost:27017/vendingmachine';
+mongoose.connect(url);
 const Vending = require('./models/model.js');
-const bodyParser = require('body-parser');
-mongoose.connect('mongodb://localhost:27017/vendingMachine');
+const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
+const ObjectId = require('mongodb').ObjectID;
+app.use(bodyParser.json())
 
-app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-  console.log('in the get');
-  Vending.find().then((results) =>{
-    res.json({products: results })
+
+app.get('/',function(req, res) {
+  Vending.find()
+  .then(function(results) {
+    res.json({status: 'success', 'data': results
   })
 })
-
-app.post('/api/vendor/items/', (req, res,) => {
-  const vendingSnacks = new Vending ({
-   snack : req.body.snack,
-   quantity : req.body.quantity,
-   price : req.body.price
 })
-    vendingSnacks.save()
-      .then(() => {
-        res.json({status : 'success'})
-      })
-  });
 
+app.post('/api/vendor/items', function(req, res) {
+  console.log(req.body);
+  const newItem = new Vending({
+    description: req.body.description,
+    cost: req.body.cost,
+    quantity: req.body.quantity
+  })
+  newItem.save()
+   .then(function(results) {
+     console.log("saved " + results);
+     res.json({status: 'success'})
+   })
+})
 
-app.post('/api/customer/items/:itemId/purchases', (req, res,) => {
+app.post('/api/vendor/items/:itemId', function(req, res) {
+  let id = req.params.id
+
   Vending.updateOne({
       _id: new ObjectId(id)
-    }, {$inc:{quantity : -1}})
-    .then((results) => {
-      res.json( {status : 'success'})
+    }, {$set:{
+      description: req.body.description,
+      cost: req.body.cost,
+      quantity: req.body.quantity
+    }})
+    .then(function(results) {
+      res.json({status: 'success'})
     })
-})
-
-
-
-app.listen(3000, () => {
-  console.log('Successfully started express application!');
-})
+});
+app.listen(3000, function() {
+  console.log('Successfully started express appslication!');
+});

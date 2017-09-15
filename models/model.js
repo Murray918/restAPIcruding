@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const vendorSchema = new mongoose.Schema({
+const VendorSchema = new mongoose.Schema({
   snack: String,
   quantity: Number,
-  price: Number 
+  price: Number
 })
 
-const VendorSchema = mongoose.model('VendorSchema', vendorSchema);
+const Vending = mongoose.model('VendorSchema', VendorSchema);
 
-module.exports = VendorSchema
+module.exports = Vending
